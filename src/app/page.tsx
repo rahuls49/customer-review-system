@@ -1,65 +1,213 @@
-import Image from "next/image";
+import { ClipboardList, Store, Users, TrendingUp, ArrowRight, CheckCircle } from 'lucide-react';
+import Link from 'next/link';
 
-export default function Home() {
+export default function HomePage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main>
+      {/* Hero Section */}
+      <div
+        style={{
+          minHeight: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          background: `
+            radial-gradient(ellipse at top, hsl(220 90% 95%) 0%, transparent 50%),
+            radial-gradient(ellipse at bottom right, hsl(142 76% 95%) 0%, transparent 40%),
+            hsl(var(--color-bg))
+          `,
+        }}
+      >
+        {/* Header */}
+        <header style={{
+          padding: '20px 48px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          borderBottom: '1px solid hsl(var(--color-border))',
+          background: 'hsl(var(--color-bg-secondary) / 0.8)',
+          backdropFilter: 'blur(10px)'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{
+              width: '40px',
+              height: '40px',
+              background: 'linear-gradient(135deg, hsl(var(--color-primary)) 0%, hsl(var(--color-primary-dark)) 100%)',
+              borderRadius: '10px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 4px 12px hsl(var(--color-primary) / 0.3)'
+            }}>
+              <ClipboardList size={22} color="white" />
+            </div>
+            <span style={{ fontSize: '1.5rem', fontWeight: 700, color: 'hsl(var(--color-text-primary))' }}>ReviewTrack</span>
+          </div>
+          <Link href="/login" className="btn btn-primary">
+            Sign In
+          </Link>
+        </header>
+
+        {/* Hero content */}
+        <div style={{
+          flex: 1,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '48px'
+        }}>
+          <div style={{ maxWidth: '900px', textAlign: 'center' }}>
+            <div style={{
+              display: 'inline-block',
+              padding: '8px 16px',
+              background: 'hsl(var(--color-primary) / 0.1)',
+              borderRadius: '999px',
+              fontSize: '0.875rem',
+              fontWeight: 500,
+              color: 'hsl(var(--color-primary))',
+              marginBottom: '24px',
+              border: '1px solid hsl(var(--color-primary) / 0.2)'
+            }}>
+              ✨ Customer Feedback Management System
+            </div>
+
+            <h1 style={{
+              fontSize: '3.5rem',
+              fontWeight: 800,
+              lineHeight: 1.1,
+              letterSpacing: '-0.03em',
+              marginBottom: '24px',
+              color: 'hsl(var(--color-text-primary))',
+            }}>
+              Turn Negative Reviews Into{' '}
+              <span style={{
+                background: 'linear-gradient(135deg, hsl(var(--sla-on-time)) 0%, hsl(142 76% 45%) 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+              }}>
+                Positive Actions
+              </span>
+            </h1>
+
+            <p style={{
+              fontSize: '1.25rem',
+              color: 'hsl(var(--color-text-secondary))',
+              lineHeight: 1.6,
+              marginBottom: '48px',
+              maxWidth: '600px',
+              margin: '0 auto 48px'
+            }}>
+              Automatically convert customer complaints into actionable tasks for your team leaders.
+              Track resolution times with SLA monitoring and improve your store performance.
+            </p>
+
+            <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', marginBottom: '64px' }}>
+              <Link href="/login" className="btn btn-primary" style={{ padding: '14px 28px', fontSize: '1rem' }}>
+                Get Started <ArrowRight size={18} style={{ marginLeft: '8px' }} />
+              </Link>
+              <Link href="#features" className="btn btn-ghost" style={{ padding: '14px 28px', fontSize: '1rem' }}>
+                Learn More
+              </Link>
+            </div>
+
+            {/* Key Benefits */}
+            <div style={{
+              display: 'flex',
+              justifyContent: 'center',
+              gap: '32px',
+              marginBottom: '64px',
+              flexWrap: 'wrap'
+            }}>
+              {[
+                'Auto-assign tasks to Team Leaders',
+                'Real-time SLA tracking',
+                'Multi-store analytics'
+              ].map((benefit, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'hsl(var(--color-text-secondary))' }}>
+                  <CheckCircle size={18} color="hsl(142, 76%, 36%)" />
+                  <span style={{ fontSize: '0.9rem' }}>{benefit}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Feature highlights */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(3, 1fr)',
+              gap: '24px',
+              marginTop: '32px'
+            }}>
+              <div className="card" style={{ textAlign: 'left' }}>
+                <div style={{
+                  width: '48px',
+                  height: '48px',
+                  background: 'hsl(var(--color-primary) / 0.1)',
+                  borderRadius: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: '16px'
+                }}>
+                  <Store size={24} color="hsl(220, 90%, 50%)" />
+                </div>
+                <h3 style={{ fontWeight: 600, marginBottom: '8px', color: 'hsl(var(--color-text-primary))' }}>Multi-Store Support</h3>
+                <p style={{ fontSize: '0.875rem', color: 'hsl(var(--color-text-secondary))' }}>
+                  Manage feedback from all your retail locations in one centralized platform.
+                </p>
+              </div>
+
+              <div className="card" style={{ textAlign: 'left' }}>
+                <div style={{
+                  width: '48px',
+                  height: '48px',
+                  background: 'hsl(var(--sla-on-time) / 0.1)',
+                  borderRadius: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: '16px'
+                }}>
+                  <Users size={24} color="hsl(142, 76%, 36%)" />
+                </div>
+                <h3 style={{ fontWeight: 600, marginBottom: '8px', color: 'hsl(var(--color-text-primary))' }}>Automatic Assignment</h3>
+                <p style={{ fontSize: '0.875rem', color: 'hsl(var(--color-text-secondary))' }}>
+                  Tasks are automatically assigned to the right Team Leader based on section.
+                </p>
+              </div>
+
+              <div className="card" style={{ textAlign: 'left' }}>
+                <div style={{
+                  width: '48px',
+                  height: '48px',
+                  background: 'hsl(var(--color-warning) / 0.1)',
+                  borderRadius: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: '16px'
+                }}>
+                  <TrendingUp size={24} color="hsl(38, 92%, 50%)" />
+                </div>
+                <h3 style={{ fontWeight: 600, marginBottom: '8px', color: 'hsl(var(--color-text-primary))' }}>SLA Tracking</h3>
+                <p style={{ fontSize: '0.875rem', color: 'hsl(var(--color-text-secondary))' }}>
+                  Monitor resolution times with color-coded status: Green (on-time), Red (delayed), Black (pending).
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+
+        {/* Footer */}
+        <footer style={{
+          padding: '24px 48px',
+          borderTop: '1px solid hsl(var(--color-border))',
+          textAlign: 'center',
+          color: 'hsl(var(--color-text-muted))',
+          fontSize: '0.875rem',
+          background: 'hsl(var(--color-bg-secondary))'
+        }}>
+          © 2024 ReviewTrack. Built for retail excellence.
+        </footer>
+      </div>
+    </main>
   );
 }

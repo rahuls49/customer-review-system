@@ -1,0 +1,232 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ============================================
+// ENUMS
+// ============================================
+
+enum UserRole {
+  SUPERADMIN
+  ADMIN
+  TL
+}
+
+enum TaskStatus {
+  PENDING
+  ON_TIME
+  DELAYED
+}
+
+enum SLAStatus {
+  ON_TIME    // Green: Resolved within 0-24 hours
+  DELAYED    // Red: Resolved between 24-48 hours
+  PENDING    // Black: Open for > 48 hours or no action
+}
+
+// ============================================
+// MODELS
+// ============================================
+
+model Shop {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  slug      String   @unique // URL-friendly identifier for review form (e.g., "ssrpr")
+  address   String?
+  city      String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  users        User[]
+  reviews      Review[]
+  tasks        Task[]
+  userSections UserSection[]
+
+  @@map("shops")
+}
+
+model Section {
+  id           String   @id @default(cuid())
+  name         String   @unique
+  displayOrder Int      @default(0)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  reviews      Review[]
+  tasks        Task[]
+  userSections UserSection[]
+
+  @@map("sections")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  phone     String?
+  role      UserRole @default(TL)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Shop relation (Admins and TLs are assigned to a specific shop)
+  shopId String?
+  shop   Shop?   @relation(fields: [shopId], references: [id])
+
+  // Relations
+  assignedTasks Task[]        @relation("TaskAssignee")
+  userSections  UserSection[]
+  sessions      Session[]
+  accounts      Account[]
+
+  @@map("users")
+}
+
+// Junction table for TL <-> Section mapping within a Shop
+// This allows one TL to manage multiple sections
+model UserSection {
+  id        String   @id @default(cuid())
+  userId    String
+  sectionId String
+  shopId    String
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  section Section @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  shop    Shop    @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, sectionId, shopId])
+  @@map("user_sections")
+}
+
+model Review {
+  id                String   @id @default(cuid())
+  tallySubmissionId String?  // Used to group reviews from same multi-section submission or Tally webhook
+  customerName      String?
+  customerPhone     String?
+  customerEmail     String?
+  rating            Int      // 1-5 star rating
+  comment           String?  @db.Text
+  source            String?  // WEB_FORM, TALLY, API, etc.
+  isProcessed       Boolean  @default(false) // Has the cron job processed this?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relations
+  shopId    String
+  shop      Shop    @relation(fields: [shopId], references: [id])
+  sectionId String?  // Optional - customer may not know section
+  section   Section? @relation(fields: [sectionId], references: [id])
+
+  // One-to-one with Task (only for negative reviews)
+  task Task?
+
+  @@index([isProcessed, rating])
+  @@index([createdAt])
+  @@index([tallySubmissionId])
+  @@map("reviews")
+}
+
+model Task {
+  id         String     @id @default(cuid())
+  status     TaskStatus @default(PENDING)
+  slaStatus  SLAStatus  @default(PENDING)
+  assignedAt DateTime   @default(now()) // Timer starts from here
+  resolvedAt DateTime?
+  remarks    String?    @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  reviewId String @unique
+  review   Review @relation(fields: [reviewId], references: [id])
+
+  assignedToId String?
+  assignedTo   User?   @relation("TaskAssignee", fields: [assignedToId], references: [id])
+
+  shopId String
+  shop   Shop   @relation(fields: [shopId], references: [id])
+
+  sectionId String
+  section   Section @relation(fields: [sectionId], references: [id])
+
+  @@index([status])
+  @@index([slaStatus])
+  @@index([assignedAt])
+  @@index([assignedToId])
+  @@map("tasks")
+}
+
+// ============================================
+// NEXT-AUTH MODELS
+// ============================================
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// ============================================
+// CRON JOB TRACKING
+// ============================================
+
+model CronJobLog {
+  id          String   @id @default(cuid())
+  jobName     String
+  status      String   // 'SUCCESS' | 'FAILED'
+  message     String?  @db.Text
+  reviewsProcessed Int  @default(0)
+  tasksCreated     Int  @default(0)
+  startedAt   DateTime @default(now())
+  completedAt DateTime?
+
+  @@index([jobName, startedAt])
+  @@map("cron_job_logs")
+}
