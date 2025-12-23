@@ -27,14 +27,15 @@ const SECTIONS = [
 
 // Sample shops for seeding
 const SHOPS = [
-    { name: 'Downtown Store', address: '123 Main Street', city: 'Mumbai' },
-    { name: 'Mall Branch', address: 'City Mall, Floor 2', city: 'Delhi' },
-    { name: 'High Street Outlet', address: '45 High Street', city: 'Bangalore' },
+    { name: 'Downtown Store', slug: 'downtown-store', address: '123 Main Street', city: 'Mumbai' },
+    { name: 'Mall Branch', slug: 'mall-branch', address: 'City Mall, Floor 2', city: 'Delhi' },
+    { name: 'High Street Outlet', slug: 'high-street-outlet', address: '45 High Street', city: 'Bangalore' },
 ];
 
 interface Shop {
     id: string;
     name: string;
+    slug: string;
     address: string | null;
     city: string | null;
 }
