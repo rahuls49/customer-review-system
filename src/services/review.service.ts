@@ -94,7 +94,7 @@ export async function storeReview(reviewData: ParsedTallyReview) {
     }
 
     // Check if review already exists (prevent duplicates)
-    const existingReview = await prisma.review.findUnique({
+    const existingReview = await prisma.review.findFirst({
         where: {
             tallySubmissionId: reviewData.tallySubmissionId,
         },
@@ -124,7 +124,7 @@ export async function storeReview(reviewData: ParsedTallyReview) {
         },
     });
 
-    console.log(`Review stored: ${review.id} - Rating: ${review.rating} - Shop: ${review.shop.name} - Section: ${review.section.name}`);
+    console.log(`Review stored: ${review.id} - Rating: ${review.rating} - Shop: ${review.shop.name} - Section: ${review.section?.name || 'Unknown'}`);
 
     return review;
 }

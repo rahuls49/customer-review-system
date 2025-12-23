@@ -38,7 +38,7 @@ export async function runDailyTaskAssignment(): Promise<{
 
                 if (task) {
                     tasksCreated++;
-                    console.log(`✅ Task created for review ${review.id} - Assigned to: ${task.assignedTo?.name || 'Unassigned'}`);
+                    console.log(`✅ Task created for review ${review.id} (Task ID: ${task.id})`);
                 }
             } catch (error) {
                 const errorMessage = error instanceof Error ? error.message : 'Unknown error';

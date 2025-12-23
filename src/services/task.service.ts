@@ -65,6 +65,12 @@ export async function createTaskFromReview(reviewId: string) {
         return null;
     }
 
+    // Task requires a sectionId - skip if review doesn't have one
+    if (!review.sectionId) {
+        console.log(`Skipping review without section: ${reviewId}`);
+        return null;
+    }
+
     // Find the TL assigned to this section in this shop
     const userSection = await prisma.userSection.findFirst({
         where: {
@@ -113,7 +119,7 @@ export async function createTaskFromReview(reviewId: string) {
         data: { isProcessed: true },
     });
 
-    console.log(`Task created: ${task.id} - Assigned to: ${task.assignedTo?.name || 'Unassigned'}`);
+    console.log(`Task created: ${task.id} - Assigned to: ${userSection?.user?.name || 'Unassigned'}`);
 
     return task;
 }
